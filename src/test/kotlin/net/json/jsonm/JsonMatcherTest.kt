@@ -4,13 +4,14 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isSuccess
+import kotlin.Result.Companion.failure
+import kotlin.Result.Companion.success
+import net.json.jsonm.JsonMatcher.Companion.matchJson
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import kotlin.Result.Companion.failure
-import kotlin.Result.Companion.success
 
 @TestInstance(PER_CLASS)
 class JsonMatcherTest {
@@ -18,6 +19,64 @@ class JsonMatcherTest {
         Arguments.of(
             """
                 *
+            """,
+            """
+                {
+                    "firstName": "John",
+                    "lastName": "Smith"
+                }
+            """,
+            success(true)
+        ),
+        Arguments.of(
+            """
+                {
+                    "xyz": /[0-9]+/,
+                    *: *,
+                    "firstName"?: "John",
+                    "lastName": "Smith"
+                }
+            """,
+            """
+                {
+                    "lastName": "Smith",
+                    "xyz": "123",
+                    "son": { }
+                }
+            """,
+            success(true)
+        ),
+        Arguments.of(
+            """
+                {
+                    *: *,
+                    "firstName"?: "John",
+                    "age": int,
+                    "employed": boolean,
+                    "son": {
+                        "firstName"?: string,
+                        "lastName": /J[a-z]+/
+                    }
+                }
+            """,
+            """
+                {
+                    "firstName": "John",
+                    "age": 50, 
+                    "employed": true,
+                    "son": {
+                        "firstName": "Smith",
+                        "lastName": "John"
+                    }
+                }
+            """,
+            success(true)
+        ),
+        Arguments.of(
+            """
+                {
+                    *: *
+                }
             """,
             """
                 {
@@ -60,7 +119,6 @@ class JsonMatcherTest {
         Arguments.of(
             """
                 {
-                    "xyz": /[0-9]/,
                     *: *,
                     "firstName"?: "John",
                     "lastName": "Smith"
@@ -68,9 +126,156 @@ class JsonMatcherTest {
             """,
             """
                 {
-                    "firstName": "John",
+                    "firstName": "John"
+                }
+            """,
+            failure<Boolean>(MismatchException("required field \"lastName\" missing from $"))
+        ),
+        Arguments.of(
+            """
+                {
+                    "firstName"?: "John",
                     "lastName": "Smith"
                 }
+            """,
+            """
+                {
+                    "lastName": "Smith",
+                    "second_lastName": "John"
+                }
+            """,
+            failure<Boolean>(MismatchException("unexpected field \"second_lastName\" in object $"))
+        ),
+        Arguments.of(
+            """
+                {
+                    "firstName"?: "John",
+                    "son": {
+                        "firstName"?: *,
+                        "lastName": *
+                    }
+                }
+            """,
+            """
+                {
+                    "firstName": "John",
+                    "son": {
+                        "firstName": "Smith"
+                    }
+                }
+            """,
+            failure<Boolean>(MismatchException("required field \"lastName\" missing from $.\"son\""))
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   int,
+                   (boolean)+,
+                   (null)*,
+                   (number)+,
+                   (boolean|null)?,
+                   *
+               ]
+            """,
+            """
+                [
+                   "firstEntry",
+                   123,
+                   true,
+                   123.3E+10,
+                   234,
+                   false
+                ]
+            """,
+            success(true)
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   int,
+                   (boolean)+,
+                   (null)*,
+                   (number)+,
+                   (boolean|null)?,
+                   *
+               ]
+            """,
+            """
+                [
+                   "firstEntry",
+                   true,
+                   123.3E+10,
+                   234,
+                   false
+                ]
+            """,
+            failure<Boolean>(MismatchException("unexpected value in array $[1]"))
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   int,
+                   (boolean)+,
+                   (null)*,
+                   (number)+,
+                   (boolean|null)?,
+                   *
+               ]
+            """,
+            """
+                [
+                   "firstEntry",
+                   123,
+                   123.3E+10,
+                   234,
+                   false
+                ]
+            """,
+            failure<Boolean>(MismatchException("unexpected value in array $[2]"))
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   (int)+
+               ]
+            """,
+            """
+                [
+                   "firstEntry"
+                ]
+            """,
+            failure<Boolean>(MismatchException("required value missed in array $[1]"))
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   (int)+
+               ]
+            """,
+            """
+                [
+                   "firstEntry",
+                   123
+                ]
+            """,
+            success(true)
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   (int)*
+               ]
+            """,
+            """
+                [
+                   "firstEntry"
+                ]
             """,
             success(true)
         )
@@ -79,9 +284,7 @@ class JsonMatcherTest {
     @ParameterizedTest
     @MethodSource("paramProvider")
     fun `test JsonMatcher match`(jsonMatchStr: String, jsonStr: String, rtn: Any) {
-        val jsonMatcher = JsonmReader.fromString(jsonMatchStr).readAsJsonMatcher()
-        val json = JsonmReader.fromString(jsonStr).readAsJson()
-        val result = jsonMatcher.match(json)
+        val result = jsonMatchStr matchJson jsonStr
         val expected = rtn as Result<*>
         if (expected.isSuccess) {
             assertThat(result).isSuccess()

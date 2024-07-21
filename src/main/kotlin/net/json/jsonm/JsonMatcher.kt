@@ -30,15 +30,31 @@ class JsonMatcher internal constructor(private val jsonMatch: JsonmParser.JsonMa
             }
         }
         private fun validate(array: JsonmParser.ArrayMatchContext) {
-            array.arrayEntryMatch().forEach { entry: JsonmParser.ArrayEntryMatchContext ->
-                entry.valueMatch().singleValueMatch().forEach { value: JsonmParser.SingleValueMatchContext ->
-                    validate(value)
+            if (!array.arrayEntryMatch().isNullOrEmpty()) {
+                array.arrayEntryMatch().forEach { entry: JsonmParser.ArrayEntryMatchContext ->
+                    entry.valueMatch().singleValueMatch().forEach { value: JsonmParser.SingleValueMatchContext ->
+                        validate(value)
+                    }
+                }
+                val wildCardIndex = array.arrayEntryMatch().indexOfFirst {
+                    it.valueMatch().WILDCARD() != null
+                }
+                if (wildCardIndex >= 0 && wildCardIndex < array.arrayEntryMatch().lastIndex) {
+                    throw JsonMatchValidationException(
+                        "wildcard entry match must be the last one in the array ${array.locateInJson()}"
+                    )
                 }
             }
         }
         private fun validate(value: JsonmParser.SingleValueMatchContext) {
             value.objectMatch()?.let { validate(it) }
             value.arrayMatch()?.let { validate(it) }
+        }
+
+        infix fun String.matchJson(jsonStr: String): Result<Boolean> {
+            val jsonMatcher = JsonmReader.fromString(this).readAsJsonMatcher()
+            val json = JsonmReader.fromString(jsonStr).readAsJson()
+            return jsonMatcher.match(json)
         }
     }
 

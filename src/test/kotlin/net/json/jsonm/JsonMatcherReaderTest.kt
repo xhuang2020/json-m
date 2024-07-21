@@ -30,7 +30,9 @@ class JsonMatcherReaderTest {
             """
                 [ ]    
             """,
-
+            """
+                [1, 2, * ]    
+            """,
             """
                 [*](3,4)
             """,
@@ -46,6 +48,18 @@ class JsonMatcherReaderTest {
                     *: *,
                     "firstName"?: "John",
                     "lastName": "Smith"
+                }
+            """,
+            """
+                {
+                    *: *,
+                    "firstName"?: "John",
+                    "age": int,
+                    "employed": boolean,
+                    "son": {
+                        "firstName"?: string,
+                        "lastName": /J[a-z]+/
+                    }
                 }
             """
         )
@@ -83,6 +97,12 @@ class JsonMatcherReaderTest {
             [
                 "John"
                 null
+            ]
+            """,
+            """
+            [
+                *,
+                "John"
             ]
             """,
             """

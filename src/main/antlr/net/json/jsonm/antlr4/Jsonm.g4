@@ -61,8 +61,8 @@ keyMatch: WILDCARD
 arrayMatch: '[' arrayEntryMatch (',' arrayEntryMatch)* ']' sizeRange?
     | '[' ']'
     ;
-sizeRange: '(' INT? ',' INT? ')'
-    | '(' INT ')'
+sizeRange: '(' lowerBound = INT? ',' uppperBound = INT? ')'
+    | '(' sizeBound = INT ')'
     ;
 arrayEntryMatch: '(' valueMatch ')' op = ('?'|'+'|'*')
     | valueMatch
@@ -74,6 +74,7 @@ singleValueMatch: NULL_WORD
     | NUMBER_WORD
     | INT_WORD
     | BOOLEAN_WORD
+    | STRING_WORD
     | BOOLEAN
     | number
     | STRING
@@ -94,4 +95,6 @@ NUMBER_WORD: 'number'
 INT_WORD: 'int'
     ;
 BOOLEAN_WORD: 'boolean'
+    ;
+STRING_WORD: 'string'
     ;
