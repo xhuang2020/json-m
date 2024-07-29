@@ -23,7 +23,7 @@ fun test() {
 # Patterns
 
 ### Exact match
-Any json objet or array is by definition a json-m pattern exactly matching itself.
+Any json object or array is by definition a json-m pattern exactly matching itself.
 ```
 fun test() {
    val jsonMatchString = """
