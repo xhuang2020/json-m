@@ -270,7 +270,7 @@ class JsonMatcherTest {
                [
                    /[a-zA-Z]+/,
                    (int)*
-               ]
+               ](1, 2)
             """,
             """
                 [
@@ -278,6 +278,22 @@ class JsonMatcherTest {
                 ]
             """,
             success(true)
+        ),
+        Arguments.of(
+            """
+               [
+                   /[a-zA-Z]+/,
+                   (int)*
+               ](1, 2)
+            """,
+            """
+                [
+                   "firstEntry",
+                   "secondEntry",
+                   "thirdEntry"
+                ]
+            """,
+            failure<Boolean>(MismatchException("required maximum array size=2, but the actual array size=3 in array $"))
         )
     )
 

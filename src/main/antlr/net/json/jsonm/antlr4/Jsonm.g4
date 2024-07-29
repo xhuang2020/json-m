@@ -41,6 +41,10 @@ FRACTION: '.' [0-9]+
     ;
 EXP: [Ee] [+\-]? INT
     ;
+LINE_COMMENT: '//' .*? '\r'? '\n' -> skip
+    ;
+COMMENT: '/*' .*? '*/' -> skip
+    ;
 WS: [ \t\r\n]+ -> skip
     ;
 
