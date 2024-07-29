@@ -437,7 +437,7 @@ It can take several formats as below:
 ### Comment
 json-m supports Java-style comments:
  - Single line comments, starts with "//" until the end of the line
- - Multi line comments, starts with "/*" and ends with "*/"
+ - Multi line comments, starts with "/\*" and ends with "\*/"
 
 Comments are ignored by the json-m parser.
 
