@@ -434,6 +434,13 @@ It can take several formats as below:
    It matches with any json string which matches with the specified regex 
    (The regex syntax follows the [Java convention](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html))
 
+### Comment
+json-m supports Java-style comments:
+ - Single line comments, starts with "//" until the end of the line
+ - Multi line comments, starts with "/*" and ends with "*/"
+
+Comments are ignored by the json-m parser.
+
 With the above definitions, we can specify the following json-m pattern:
 ```
 {                                  // the target json must be a json object with the following restrictions:
