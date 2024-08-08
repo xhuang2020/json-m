@@ -425,12 +425,14 @@ It can take several formats as below:
 7. A word "number":
    It matches with any json number, including decimal and integer
 8. A word "int":
-   It matches with any non-negative integer
-9. A word "boolean":
+   It matches with any integer
+9. A word "float":
+    It matches with any decimal
+10. A word "boolean":
    It matches with any boolean value, including true and false
-10. A word "string":
+11. A word "string":
    It matches with any string value
-11. A regex surrounded with a pair of "/":
+12. A regex surrounded with a pair of "/":
    It matches with any json string which matches with the specified regex 
    (The regex syntax follows the [Java convention](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html))
 

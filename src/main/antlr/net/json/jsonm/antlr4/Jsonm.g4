@@ -76,6 +76,7 @@ valueMatch: WILDCARD
     ;
 singleValueMatch: NULL_WORD
     | NUMBER_WORD
+    | FLOAT_WORD
     | INT_WORD
     | BOOLEAN_WORD
     | STRING_WORD
@@ -95,6 +96,8 @@ OPTCARD: '?'
 NULL_WORD: 'null'
     ;
 NUMBER_WORD: 'number'
+    ;
+FLOAT_WORD: 'float'
     ;
 INT_WORD: 'int'
     ;

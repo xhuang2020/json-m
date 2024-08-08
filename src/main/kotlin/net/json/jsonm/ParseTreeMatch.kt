@@ -229,6 +229,11 @@ private fun match(
         if (value.number() == null) {
             return Result.failure(MismatchException("expect number at ${value.locateInJson()}"))
         }
+    } else if (singleValueMatch.FLOAT_WORD() != null) {
+        val num = value.number()
+        if (num == null || num.FRACTION() == null && num.EXP() == null) {
+            return Result.failure(MismatchException("expect float at ${value.locateInJson()}"))
+        }
     } else if (singleValueMatch.INT_WORD() != null) {
         val num = value.number()
         if (num == null || num.FRACTION() != null || num.EXP() != null) {

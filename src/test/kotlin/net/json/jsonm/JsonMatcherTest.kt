@@ -149,6 +149,36 @@ class JsonMatcherTest {
         Arguments.of(
             """
                 {
+                    "name": *,
+                    "weight": float
+                }
+            """,
+            """
+                {
+                    "name": "Smith",
+                    "weight": 123
+                }
+            """,
+            failure<Boolean>(MismatchException("expect float at $.\"weight\""))
+        ),
+        Arguments.of(
+            """
+                {
+                    "name": *,
+                    "age": int
+                }
+            """,
+            """
+                {
+                    "name": "Smith",
+                    "age": 40.1
+                }
+            """,
+            failure<Boolean>(MismatchException("expect integer at $.\"age\""))
+        ),
+        Arguments.of(
+            """
+                {
                     "firstName"?: "John",
                     "son": {
                         "firstName"?: *,
