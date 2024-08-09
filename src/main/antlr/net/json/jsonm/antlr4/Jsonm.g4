@@ -18,7 +18,9 @@ value: NULL_WORD
     | object
     | array
     ;
-number: '-'? INT FRACTION? EXP?
+number: integer FRACTION? EXP?
+    ;
+integer: '-'? INT
     ;
 BOOLEAN: 'false'
     | 'true'
@@ -75,9 +77,9 @@ valueMatch: WILDCARD
     | singleValueMatch ('|' singleValueMatch)*
     ;
 singleValueMatch: NULL_WORD
-    | NUMBER_WORD
-    | FLOAT_WORD
-    | INT_WORD
+    | NUMBER_WORD numberRange?
+    | FLOAT_WORD numberRange?
+    | INT_WORD intRange?
     | BOOLEAN_WORD
     | STRING_WORD
     | BOOLEAN
@@ -86,6 +88,10 @@ singleValueMatch: NULL_WORD
     | REGEX
     | objectMatch
     | arrayMatch
+    ;
+numberRange: openChar = ('(' | '[') lowerBound = number? ',' uppperBound = number? closeChar = (')' | ']')
+    ;
+intRange: openChar = ('(' | '[') lowerBound = integer? ',' uppperBound = integer? closeChar = (')' | ']')
     ;
 REGEX: '/' (ESC | ~[/\\])+ '/'
     ;
@@ -99,7 +105,7 @@ NUMBER_WORD: 'number'
     ;
 FLOAT_WORD: 'float'
     ;
-INT_WORD: 'int'
+INT_WORD: 'integer'
     ;
 BOOLEAN_WORD: 'boolean'
     ;

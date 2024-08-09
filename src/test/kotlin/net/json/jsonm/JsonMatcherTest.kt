@@ -51,7 +51,7 @@ class JsonMatcherTest {
                 {
                     *: *,
                     "firstName"?: "John",
-                    "age": int,
+                    "age": integer,
                     "employed": boolean,
                     "son": {
                         "firstName"?: string,
@@ -83,6 +83,15 @@ class JsonMatcherTest {
                     "firstName": "John",
                     "lastName": "Smith"
                 }
+            """,
+            success(true)
+        ),
+        Arguments.of(
+            """
+                [(float(-2.0, 4E10))+]  // Singe line comment will be ignored
+            """,
+            """
+               [0.0, -1.1, 100.2] 
             """,
             success(true)
         ),
@@ -165,7 +174,7 @@ class JsonMatcherTest {
             """
                 {
                     "name": *,
-                    "age": int
+                    "age": integer
                 }
             """,
             """
@@ -175,6 +184,58 @@ class JsonMatcherTest {
                 }
             """,
             failure<Boolean>(MismatchException("expect integer at $.\"age\""))
+        ),
+        Arguments.of(
+            """
+                {
+                    "name": *,
+                    "age": integer[1, 100)
+                }
+            """,
+            """
+                {
+                    "name": "Smith",
+                    "age": 100
+                }
+            """,
+            failure<Boolean>(MismatchException("100 is beyond the range [1,100) at $.\"age\""))
+        ),
+        Arguments.of(
+            """
+                {
+                    "name": *,
+                    "age": integer[1,100)
+                }
+            """,
+            """
+                {
+                    "name": "Smith",
+                    "age": 0
+                }
+            """,
+            failure<Boolean>(MismatchException("0 is beyond the range [1,100) at $.\"age\""))
+        ),
+        Arguments.of(
+            """
+                [(float(-2.0, 4E10))+]
+            """,
+            """
+               [0.0, -2.0, 100.2] 
+            """,
+            failure<Boolean>(MismatchException("unexpected value in array $[1]"))
+        ),
+        Arguments.of(
+            """
+              {
+                 "weight": float(-2.0, 4E10)
+              }
+            """,
+            """
+               {
+                 "weight": -2.0
+               } 
+            """,
+            failure<Boolean>(MismatchException("-2.0 is beyond the range (-2.0,4E10) at $.\"weight\""))
         ),
         Arguments.of(
             """
@@ -200,7 +261,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   int,
+                   integer,
                    (boolean)+,
                    (null)*,
                    (number)+,
@@ -224,7 +285,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   int,
+                   integer,
                    (boolean)+,
                    (null)*,
                    (number)+,
@@ -247,7 +308,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   int,
+                   integer[123,),
                    (boolean)+,
                    (null)*,
                    (number)+,
@@ -270,7 +331,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   (int)+
+                   (integer)+
                ]
             """,
             """
@@ -284,7 +345,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   (int)+
+                   (integer(100,200))+
                ]
             """,
             """
@@ -299,7 +360,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   (int)*
+                   (integer)*
                ](1, 2)
             """,
             """
@@ -313,7 +374,7 @@ class JsonMatcherTest {
             """
                [
                    /[a-zA-Z]+/,
-                   (int)*
+                   (integer)*
                ](1, 2)
             """,
             """

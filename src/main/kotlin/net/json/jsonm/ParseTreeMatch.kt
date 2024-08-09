@@ -225,19 +225,57 @@ private fun match(
         if (value.NULL_WORD() == null) {
             return Result.failure(MismatchException("expect null at ${value.locateInJson()}"))
         }
-    } else if (singleValueMatch.NUMBER_WORD() != null) {
+    } else if (singleValueMatch.NUMBER_WORD() != null || singleValueMatch.FLOAT_WORD() != null) {
         if (value.number() == null) {
-            return Result.failure(MismatchException("expect number at ${value.locateInJson()}"))
+            if (singleValueMatch.NUMBER_WORD() != null) {
+                return Result.failure(MismatchException("expect number at ${value.locateInJson()}"))
+            } else if (singleValueMatch.FLOAT_WORD() != null) {
+                return Result.failure(MismatchException("expect float at ${value.locateInJson()}"))
+            }
         }
-    } else if (singleValueMatch.FLOAT_WORD() != null) {
-        val num = value.number()
-        if (num == null || num.FRACTION() == null && num.EXP() == null) {
+        if (singleValueMatch.FLOAT_WORD() != null && value.number().FRACTION() == null && value.number().EXP() == null) {
             return Result.failure(MismatchException("expect float at ${value.locateInJson()}"))
+        }
+        if (singleValueMatch.numberRange() != null) {
+            val num = value.number().text.toDouble()
+            val range = singleValueMatch.numberRange()
+            if (range.lowerBound != null) {
+                val lower = range.lowerBound.text.toDouble()
+                if (range.openChar.text == "(" && num <= lower ||
+                    range.openChar.text == "[" && num < lower) {
+                    return Result.failure(MismatchException("$num is beyond the range ${range.text} at ${value.locateInJson()}"))
+                }
+            }
+            if (range.uppperBound != null) {
+                val upper = range.uppperBound.text.toDouble()
+                if (range.closeChar.text == ")" && num >= upper ||
+                    range.closeChar.text == "]" && num > upper) {
+                    return Result.failure(MismatchException("$num is beyond the range ${range.text} at ${value.locateInJson()}"))
+                }
+            }
         }
     } else if (singleValueMatch.INT_WORD() != null) {
         val num = value.number()
         if (num == null || num.FRACTION() != null || num.EXP() != null) {
             return Result.failure(MismatchException("expect integer at ${value.locateInJson()}"))
+        }
+        if (singleValueMatch.intRange() != null) {
+            val intValue = num.integer().text.toLong()
+            val range = singleValueMatch.intRange()
+            if (range.lowerBound != null) {
+                val lower = range.lowerBound.text.toLong()
+                if (range.openChar.text == "(" && intValue <= lower ||
+                    range.openChar.text == "[" && intValue < lower) {
+                    return Result.failure(MismatchException("$intValue is beyond the range ${range.text} at ${value.locateInJson()}"))
+                }
+            }
+            if (range.uppperBound != null) {
+                val upper = range.uppperBound.text.toLong()
+                if (range.closeChar.text == ")" && intValue >= upper ||
+                    range.closeChar.text == "]" && intValue > upper) {
+                    return Result.failure(MismatchException("$intValue is beyond the range ${range.text} at ${value.locateInJson()}"))
+                }
+            }
         }
     } else if (singleValueMatch.BOOLEAN_WORD() != null) {
         if (value.BOOLEAN() == null) {

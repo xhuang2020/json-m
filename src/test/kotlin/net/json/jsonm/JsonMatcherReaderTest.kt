@@ -23,13 +23,12 @@ class JsonMatcherReaderTest {
             {
                 "firstName"?: /[a-zA-Z]*/,
                 "lastName": "Smith",
-                "weight": number,
+                "weight": float(0, 101.3E10],
                 "children"?: [{*:*}](,)
             }
             """,
             """
-                
-                [ ]  // Singe line comment will be ignored
+                [(float(-2.0, 4E10))+]  // Singe line comment will be ignored
             """,
             """
                 [1, 2, * ]    
@@ -56,9 +55,16 @@ class JsonMatcherReaderTest {
             """,
             """
                 {
+                    "name": *,
+                    "age": integer[1,100],
+                    "weight": number[0, 210.2)
+                }
+            """,
+            """
+                {
                     *: *,
                     "firstName"?: "John",
-                    "age": int,
+                    "age": integer,
                     "employed": boolean,
                     "son": {
                         "firstName"?: string,
@@ -73,7 +79,7 @@ class JsonMatcherReaderTest {
                   "middleName"?: string,   // the field "middleName" is optional and its value can be any text
                   "gender": "male"|"female"|"other", // the field "gender" is required and its value must be one of "male", "female" and "other" 
                   "employed": boolean|null,  // the field "employed" is required and its value must be one of true, false and null
-                  "age": int,  // the field "age" is required and its value must be an non-negative integer
+                  "age": integer,  // the field "age" is required and its value must be an non-negative integer
                   "weight"?: number,  // the field "weight" is optional and its value must be a number if present
                   "address": [(string)+](, 6), // the field "address" is required and its value must be a string array with the maximum size of 6
                   "children"?: [               // the field "children" is optional and its value must be an array of json object
