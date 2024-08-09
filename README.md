@@ -373,9 +373,34 @@ You can specify the size requirement in the array pattern by appending the size 
 ### Value match
 Value match is used in the key-value pair matching for json object fields and the entry matching for json array.
 It can take several formats as below:
-1. A string in a valid Json syntax: 
-   it matches with the exact same json value.
-2. Multiple value matches delimited by "|": 
+1. The wildcard character '*' can match with any json values, including strings, numbers, booleans, null, objects and arrays etc. 
+2. String matching: a string enclosed with a pair of double quotes can match with the exact same json string only. Or
+    you can use the reserved word 'string' (without quotes) to match any string
+3. Regex matching: a regex enclosed with a pair of "/" can match with any json string which matches the specified regex
+   (The regex syntax follows the [Java convention](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html)) 
+4. Boolean matching: a boolean value 'true' or 'false' matches with the same boolean value only. Or you can use the reserved 
+    word 'boolean' (without quotes) to match any boolean value
+5. Null matching: you can use the reserved word 'null' (without quotes) to match with the null value
+6. Integer matching: any integer (negative integers must have a '-' sign and positive integers cannot have '+' sign)
+   match with itself in the target json. Or you can use the reserved word 'integer' (without quotes) to match any integer.
+    Furthermore, you can specify a range after the word 'integer' to restrict the value range in the target json. E.g.  
+    integer(0, 10) restricts the integer range from 0 to 10 with 0 ard 10 excluded  
+    integer\[0, 10\] restricts the integer range from 0 to 10 with 0 and 10 included  
+    integer\[0, 10) restricts the integer range from 0 to 10 with 0 included and 10 excluded  
+    integer(, 10] restricts the integer range with no lower bound and with upper bound 10 (included)  
+    integer(0, ) restricts the integer range with lower bound 0 (excluded) and with no upper bound  
+    integer(,) is essentially equivalent with just integer  
+7. Float matching: similar to the integer matching, any float number (with decimal point and/or exponential indicator E/e)
+   matches with itself in the target json. Or you can use the reserved word 'float' to match any float number.
+   Similar to integers, you can specify the float range with a pair of '(\[' and ')\]'. Its upper bound and lower bound can 
+   be any float or integer.  
+   Note: a float cannot match with an integer and an integer cannot match with a float.
+   A float must contain either a decimal point or the exponential indicator E/e, whereas an integer must contain neither.
+8. Number matching: number is a super type of integer and float. Any json number matches with itself in the target json.
+   You can use the reserved word 'number' to match with any json number. You can also specify its range in the same manner 
+   of the float range.
+   Note: a number can match with an integer or a float in the target json.
+9. Multiple value matches can be delimited by '|' to match with anyone of them: 
     e.g. for array entry
     ```
     fun test() {
@@ -414,27 +439,6 @@ It can take several formats as below:
     assertThat(jsonMatchString matchJson jsonOfJohn).isSuccess()
     }
     ```
-3. A wildcard character "*": 
-   it can match with any json values, including strings, numbers, boolean, null, object and array etc.
-4. A string enclosed with a pair of double quotes: 
-   It matches with the exact same json string
-5. A number in json format:
-   It matches with the exact same json number
-6. A word "true" or "false":
-   It matches with the exact same json boolean value
-7. A word "number":
-   It matches with any json number, including decimal and integer
-8. A word "int":
-   It matches with any integer
-9. A word "float":
-    It matches with any decimal
-10. A word "boolean":
-   It matches with any boolean value, including true and false
-11. A word "string":
-   It matches with any string value
-12. A regex surrounded with a pair of "/":
-   It matches with any json string which matches with the specified regex 
-   (The regex syntax follows the [Java convention](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html))
 
 ### Comment
 json-m supports Java-style comments:
@@ -451,8 +455,8 @@ With the above definitions, we can specify the following json-m pattern:
   "middleName"?: string,           // the field "middleName" is optional and its value can be any text
   "gender": "male"|"female"|"other", // the field "gender" is required and its value must be one of "male", "female" and "other" 
   "employed": boolean|null,        // the field "employed" is required and its value must be one of true, false and null
-  "age": int,                      // the field "age" is required and its value must be an non-negative integer
-  "weight"?: number,               // the field "weight" is optional and its value must be a number if present
+  "age": integer[0,),              // the field "age" is required and its value must be an non-negative integer
+  "weight"?: number(0.0,),         // the field "weight" is optional and its value must be a positive number if present
   "address": [(string)+](, 6),     // the field "address" is required and its value must be a string array with the maximum size of 6
   "children"?: [                   // the field "children" is optional and its value must be an array of json object
      ({                            // which contains at least the field "lastName" with the value being "Smith" and optionally
