@@ -73,7 +73,8 @@ class JsonMatcherReaderTest {
                 }
             """,
             """
-               {                        /* the target json must be a json object with the following restrictions: */
+                /* the target json must be a json object with the following restrictions: */
+               {                        
                   "lastName": "Smith", // the field "lastName" is required and its value must be "Smith"
                   "firstName": /[a-ZA-Z]+/, // the field "firstName" is required and its value must match with the regex [a-ZA-Z]+
                   "middleName"?: string,   // the field "middleName" is optional and its value can be any text

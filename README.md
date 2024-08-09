@@ -384,7 +384,7 @@ It can take several formats as below:
 6. Integer matching: any integer (negative integers must have a '-' sign and positive integers cannot have '+' sign)
    match with itself in the target json. Or you can use the reserved word 'integer' (without quotes) to match any integer.
     Furthermore, you can specify a range after the word 'integer' to restrict the value range in the target json. E.g.  
-    integer(0, 10) restricts the integer range from 0 to 10 with 0 ard 10 excluded  
+    integer(0, 10) restricts the integer range from 0 to 10 with 0 and 10 excluded  
     integer\[0, 10\] restricts the integer range from 0 to 10 with 0 and 10 included  
     integer\[0, 10) restricts the integer range from 0 to 10 with 0 included and 10 excluded  
     integer(, 10] restricts the integer range with no lower bound and with upper bound 10 (included)  
@@ -398,7 +398,7 @@ It can take several formats as below:
    A float must contain either a decimal point or the exponential indicator E/e, whereas an integer must contain neither.
 8. Number matching: number is a super type of integer and float. Any json number matches with itself in the target json.
    You can use the reserved word 'number' to match with any json number. You can also specify its range in the same manner 
-   of the float range.
+   of the float range.  
    Note: a number can match with an integer or a float in the target json.
 9. Multiple value matches can be delimited by '|' to match with anyone of them: 
     e.g. for array entry
@@ -449,7 +449,10 @@ Comments are ignored by the json-m parser.
 
 With the above definitions, we can specify the following json-m pattern:
 ```
-{                                  // the target json must be a json object with the following restrictions:
+/* 
+the target json must be a json object with the following restrictions:
+*/
+{                                  
   "lastName": "Smith",             // the field "lastName" is required and its value must be "Smith"
   "firstName": /[a-ZA-Z]+/,        // the field "firstName" is required and its value must match with the regex [a-ZA-Z]+
   "middleName"?: string,           // the field "middleName" is optional and its value can be any text
