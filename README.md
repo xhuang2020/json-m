@@ -469,3 +469,9 @@ the target json must be a json object with the following restrictions:
   ]
 }
 ```
+
+# Next Step
+json-m can grow into a full fledged language for json schema.
+Compared with the standard [Json Schema](https://json-schema.org/) and [Open API](https://www.openapis.org/),
+json-m has an obvious advantage that it resembles its target json, 
+whereas when reading a Json Schema, a developer has to translate the Json Schema into the target json in their mind.
