@@ -1,5 +1,60 @@
 grammar Jsonm;
-// json syntax
+// Lexer rules
+LINE_COMMENT: '//' .*? '\r'? '\n' -> skip
+    ;
+COMMENT: '/*' .*? '*/' -> skip
+    ;
+WS: [ \t\r\n]+ -> skip
+    ;
+STRING: '"' LETTER* '"'
+    ;
+fragment LETTER: ESC
+    | ~["\\]
+    ;
+fragment ESC: '\\' (["\\/bfnrt] | UNICODE)
+    ;
+fragment UNICODE: 'u' HEX HEX HEX HEX
+    ;
+fragment HEX: [0-9a-fA-F]
+    ;
+FRACTION: '.' [0-9]+
+    ;
+EXP: [Ee] [+\-]? INT
+    ;
+INT: '0'
+    | [1-9][0-9]*
+    ;
+REGEX: '/' (ESC | ~[/\\])+ '/'
+    ;
+WILDCARD: '*'
+    ;
+OPTCARD: '?'
+    ;
+BOOLEAN: 'false'
+    | 'true'
+    ;
+NULL_WORD: 'null'
+    ;
+NUMBER_WORD: 'number'
+    ;
+FLOAT_WORD: 'float'
+    ;
+INT_WORD: 'integer'
+    ;
+BOOLEAN_WORD: 'boolean'
+    ;
+STRING_WORD: 'string'
+    ;
+IMPORT_WORD: 'import'
+    ;
+PACKAGE_WORD: 'package'
+    ;
+DEF_WORD: 'def'
+    ;
+ID: [_$a-zA-Z][_$a-zA-Z0-9]*
+    ;
+
+// json rules
 json: object
     | array
     ;
@@ -22,35 +77,8 @@ number: integer FRACTION? EXP?
     ;
 integer: '-'? INT
     ;
-BOOLEAN: 'false'
-    | 'true'
-    ;
-STRING: '"' LETTER* '"'
-    ;
-fragment LETTER: ESC
-    | ~["\\]
-    ;
-fragment ESC: '\\' (["\\/bfnrt] | UNICODE)
-    ;
-fragment UNICODE: 'u' HEX HEX HEX HEX
-    ;
-fragment HEX: [0-9a-fA-F]
-    ;
-INT: '0'
-    | [1-9][0-9]*
-    ;
-FRACTION: '.' [0-9]+
-    ;
-EXP: [Ee] [+\-]? INT
-    ;
-LINE_COMMENT: '//' .*? '\r'? '\n' -> skip
-    ;
-COMMENT: '/*' .*? '*/' -> skip
-    ;
-WS: [ \t\r\n]+ -> skip
-    ;
 
-// jsonm syntax
+// jsonm rules
 jsonMatch: WILDCARD
     | objectMatch
     | arrayMatch
@@ -92,22 +120,4 @@ singleValueMatch: NULL_WORD
 numberRange: openChar = ('(' | '[') lowerBound = number? ',' uppperBound = number? closeChar = (')' | ']')
     ;
 intRange: openChar = ('(' | '[') lowerBound = integer? ',' uppperBound = integer? closeChar = (')' | ']')
-    ;
-REGEX: '/' (ESC | ~[/\\])+ '/'
-    ;
-WILDCARD: '*'
-    ;
-OPTCARD: '?'
-    ;
-NULL_WORD: 'null'
-    ;
-NUMBER_WORD: 'number'
-    ;
-FLOAT_WORD: 'float'
-    ;
-INT_WORD: 'integer'
-    ;
-BOOLEAN_WORD: 'boolean'
-    ;
-STRING_WORD: 'string'
     ;
