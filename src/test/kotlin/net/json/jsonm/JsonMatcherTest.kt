@@ -2,10 +2,6 @@ package net.json.jsonm
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
-import assertk.assertions.isSuccess
-import kotlin.Result.Companion.failure
-import kotlin.Result.Companion.success
 import net.json.jsonm.JsonMatcher.Companion.matchJson
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -26,7 +22,7 @@ class JsonMatcherTest {
                     "lastName": "Smith"
                 }
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -44,7 +40,7 @@ class JsonMatcherTest {
                     "son": { }
                 }
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -70,7 +66,7 @@ class JsonMatcherTest {
                     }
                 }
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -84,7 +80,7 @@ class JsonMatcherTest {
                     "lastName": "Smith"
                 }
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -93,7 +89,7 @@ class JsonMatcherTest {
             """
                [0.0, -1.1, 100.2] 
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -108,7 +104,7 @@ class JsonMatcherTest {
                     "Smith"
                 ]
             """,
-            failure<Boolean>(MismatchException("object mismatched with array at $"))
+            MatchResult(false, "object mismatched with array at $")
         ),
         Arguments.of(
             """
@@ -123,7 +119,7 @@ class JsonMatcherTest {
                     "lastName": "Smith"
                 }
             """,
-            failure<Boolean>(MismatchException("array mismatched with object at $"))
+            MatchResult(false, "array mismatched with object at $")
         ),
         Arguments.of(
             """
@@ -138,7 +134,7 @@ class JsonMatcherTest {
                     "firstName": "John"
                 }
             """,
-            failure<Boolean>(MismatchException("required field \"lastName\" missing from $"))
+            MatchResult(false, "required field \"lastName\" missing from $")
         ),
         Arguments.of(
             """
@@ -153,7 +149,7 @@ class JsonMatcherTest {
                     "second_lastName": "John"
                 }
             """,
-            failure<Boolean>(MismatchException("unexpected field \"second_lastName\" in object $"))
+            MatchResult(false, "unexpected field \"second_lastName\" in object $")
         ),
         Arguments.of(
             """
@@ -168,7 +164,7 @@ class JsonMatcherTest {
                     "weight": 123
                 }
             """,
-            failure<Boolean>(MismatchException("expect float at $.\"weight\""))
+            MatchResult(false, "expect float at $.\"weight\"")
         ),
         Arguments.of(
             """
@@ -183,7 +179,7 @@ class JsonMatcherTest {
                     "age": 40.1
                 }
             """,
-            failure<Boolean>(MismatchException("expect integer at $.\"age\""))
+            MatchResult(false, "expect integer at $.\"age\"")
         ),
         Arguments.of(
             """
@@ -198,7 +194,7 @@ class JsonMatcherTest {
                     "age": 100
                 }
             """,
-            failure<Boolean>(MismatchException("100 is beyond the range [1,100) at $.\"age\""))
+            MatchResult(false, "100 is beyond the range [1,100) at $.\"age\"")
         ),
         Arguments.of(
             """
@@ -213,7 +209,7 @@ class JsonMatcherTest {
                     "age": 0
                 }
             """,
-            failure<Boolean>(MismatchException("0 is beyond the range [1,100) at $.\"age\""))
+            MatchResult(false, "0 is beyond the range [1,100) at $.\"age\"")
         ),
         Arguments.of(
             """
@@ -222,7 +218,7 @@ class JsonMatcherTest {
             """
                [0.0, -2.0, 100.2] 
             """,
-            failure<Boolean>(MismatchException("unexpected value in array $[1]"))
+            MatchResult(false, "unexpected value in array $[1]")
         ),
         Arguments.of(
             """
@@ -235,7 +231,7 @@ class JsonMatcherTest {
                  "weight": -2.0
                } 
             """,
-            failure<Boolean>(MismatchException("-2.0 is beyond the range (-2.0,4E10) at $.\"weight\""))
+            MatchResult(false, "-2.0 is beyond the range (-2.0,4E10) at $.\"weight\"")
         ),
         Arguments.of(
             """
@@ -255,7 +251,7 @@ class JsonMatcherTest {
                     }
                 }
             """,
-            failure<Boolean>(MismatchException("required field \"lastName\" missing from $.\"son\""))
+            MatchResult(false, "required field \"lastName\" missing from $.\"son\"")
         ),
         Arguments.of(
             """
@@ -279,7 +275,7 @@ class JsonMatcherTest {
                    false
                 ]
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -302,7 +298,7 @@ class JsonMatcherTest {
                    false
                 ]
             """,
-            failure<Boolean>(MismatchException("unexpected value in array $[1]"))
+            MatchResult(false, "unexpected value in array $[1]")
         ),
         Arguments.of(
             """
@@ -325,7 +321,7 @@ class JsonMatcherTest {
                    false
                 ]
             """,
-            failure<Boolean>(MismatchException("unexpected value in array $[2]"))
+            MatchResult(false, "unexpected value in array $[2]")
         ),
         Arguments.of(
             """
@@ -339,7 +335,7 @@ class JsonMatcherTest {
                    "firstEntry"
                 ]
             """,
-            failure<Boolean>(MismatchException("required value missed in array $[1]"))
+            MatchResult(false, "required value missed in array $[1]")
         ),
         Arguments.of(
             """
@@ -354,7 +350,7 @@ class JsonMatcherTest {
                    123
                 ]
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -368,7 +364,7 @@ class JsonMatcherTest {
                    "firstEntry"
                 ]
             """,
-            success(true)
+            MatchResult(true)
         ),
         Arguments.of(
             """
@@ -384,24 +380,13 @@ class JsonMatcherTest {
                    "thirdEntry"
                 ]
             """,
-            failure<Boolean>(MismatchException("required maximum array size=2, but the actual array size=3 in array $"))
+            MatchResult(false, "required maximum array size=2, but the actual array size=3 in array $")
         )
     )
 
     @ParameterizedTest
     @MethodSource("paramProvider")
-    fun `test JsonMatcher match`(jsonMatchStr: String, jsonStr: String, rtn: Any) {
-        val result = jsonMatchStr matchJson jsonStr
-        val expected = rtn as Result<*>
-        if (expected.isSuccess) {
-            assertThat(result).isSuccess()
-        } else {
-            val expectedException: Throwable? = expected.exceptionOrNull()
-            val resultException: Throwable? = result.exceptionOrNull()
-            assertThat(resultException).isNotNull().given { rtnException ->
-                assertThat(rtnException.javaClass).isEqualTo(expectedException?.javaClass)
-                assertThat(rtnException.message).isEqualTo(expectedException?.message)
-            }
-        }
+    fun `test JsonMatcher match`(jsonMatchStr: String, jsonStr: String, expected: MatchResult) {
+        assertThat(jsonMatchStr matchJson jsonStr).isEqualTo(expected)
     }
 }

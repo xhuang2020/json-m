@@ -15,7 +15,13 @@ import net.json.jsonm.JsonMatcher.Companion.matchJson
 fun test() {
    val jsonMatchString = "...some json-m pattern..."
    val json = "...some json..."
-   val result: Result<Boolean> = jsonMatchString matchJson json
+   val result: MatchResult = jsonMatchString matchJson json
+   if (result.isSuccess) {
+        ...
+   } else {
+       result.message
+       ...
+   }
    ...
 }
 ```

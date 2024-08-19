@@ -51,12 +51,12 @@ class JsonMatcher internal constructor(private val jsonMatch: JsonmParser.JsonMa
             value.arrayMatch()?.let { validate(it) }
         }
 
-        infix fun String.matchJson(jsonStr: String): Result<Boolean> {
+        infix fun String.matchJson(jsonStr: String): MatchResult {
             val jsonMatcher = JsonmReader.fromString(this).readAsJsonMatcher()
             val json = JsonmReader.fromString(jsonStr).readAsJson()
             return jsonMatcher.match(json)
         }
     }
 
-    fun match(json: Json): Result<Boolean> = match(jsonMatch, json.json)
+    fun match(json: Json): MatchResult = match(jsonMatch, json.json)
 }
