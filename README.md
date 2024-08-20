@@ -44,7 +44,7 @@ fun test() {
             "lastName": "Smith"
         }
    """
-   assertThat(jsonMatchString matchJson json).isSuccess()
+   assertThat((jsonMatchString matchJson json).isSuccess).isTrue()
 }
 ```
 
@@ -59,7 +59,7 @@ fun test() {
             "lastName": "Smith"
         }
    """
-   assertThat(jsonMatchString matchJson json).isSuccess()
+   assertThat((jsonMatchString matchJson json).isSuccess).isTrue()
 }
 ```
 ### Object match
@@ -78,8 +78,8 @@ fun test() {
             "lastName": "Smith"
         }
    """
-   assertThat(jsonMatchString matchJson json).isFailure()
-   assertThat(jsonMatchString matchJson "{}").isSuccess()
+   assertThat((jsonMatchString matchJson json).isSuccess).isFalse()
+   assertThat((jsonMatchString matchJson "{}").isSuccess).isTrue()
 }
 ```
 
@@ -100,7 +100,7 @@ fun test() {
             "firstName": "John"
         }
    """
-   assertThat(jsonMatchString matchJson json).isSuccess()
+   assertThat((jsonMatchString matchJson json).isSuccess).isTrue()
 }
 ```
 
@@ -119,8 +119,8 @@ fun test() {
         }
    """
    val jsonWithNoKeys = "{}"
-   assertThat(jsonMatchString matchJson json).isSuccess()
-   assertThat(jsonMatchString matchJson jsonWithNoKeys).isSuccess()
+   assertThat((jsonMatchString matchJson json).isSuccess).isTrue()
+   assertThat((jsonMatchString matchJson jsonWithNoKeys).isSuccess).isTrue()
 }
 ```
 
@@ -147,8 +147,8 @@ fun test() {
             "firstName": "John"
         }
    """
-   assertThat(jsonMatchString matchJson jsonWithLastName).isSuccess()
-   assertThat(jsonMatchString matchJson jsonWithNoLastName).isSuccess()
+   assertThat((jsonMatchString matchJson jsonWithLastName).isSuccess).isTrue()
+   assertThat((jsonMatchString matchJson jsonWithNoLastName).isSuccess).isTrue()
 }
 ```
 If no wildcard keys appear in the json-m pattern, 
@@ -172,8 +172,8 @@ fun test() {
             "firstName": "John"
         }
    """
-   assertThat(jsonMatchString matchJson jsonWithLastName).isFailure()
-   assertThat(jsonMatchString matchJson jsonWithNoLastName).isSuccess()
+   assertThat((jsonMatchString matchJson jsonWithLastName).isSucess).isFalse()
+   assertThat((jsonMatchString matchJson jsonWithNoLastName).isSuccess).isTrue()
 }
 ```
 Besides the keys, the values in the key-value pairs must also match with the corresponding values 
@@ -195,8 +195,8 @@ fun test() {
             "firstName": "Johnn"
         }
    """
-   assertThat(jsonMatchString matchJson jsonWithCorrectFirstName).isSuccess()
-   assertThat(jsonMatchString matchJson jsonWithWrongFirstName).isFailure()
+   assertThat((jsonMatchString matchJson jsonWithCorrectFirstName).isSuccess).isTrue()
+   assertThat((jsonMatchString matchJson jsonWithWrongFirstName).isSuccess).isFalse()
 }
 ```
 
@@ -214,8 +214,8 @@ fun test() {
    val nonEmptyArray = """
         ["John"]
     """
-   assertThat(jsonMatchString matchJson emptyArray).isSuccess()
-   assertThat(jsonMatchString matchJson nonEmptyArray).isFailure()
+   assertThat((jsonMatchString matchJson emptyArray).isSuccess).isTrue()
+   assertThat((jsonMatchString matchJson nonEmptyArray).isSuccess).isFalse()
 }
 ```
 
@@ -232,7 +232,7 @@ they are matched with the corresponding entries in the json array as below:
        val array = """
             ["John"]
        """
-       assertThat(jsonMatchString matchJson array).isSuccess()
+       assertThat((jsonMatchString matchJson array).isSuccess).isTrue()
     }
     ```
 - If the entry is a value surrounded with "(" and ")", it can be appended with one of the 3 qualifiers:
@@ -252,7 +252,7 @@ they are matched with the corresponding entries in the json array as below:
        val arrayWithSmithOnly = """
             ["Smith"]
        """
-      assertThat(jsonMatchString matchJson arrayWithSmithOnly).isSuccess()
+      assertThat((jsonMatchString matchJson arrayWithSmithOnly).isSuccess).isTrue()
     }
     ```
 - The entry can be a wildcard character "*", which must appear at the end of the array. 
@@ -265,7 +265,7 @@ they are matched with the corresponding entries in the json array as below:
     val array = """
     ["Smith", "Dan"]
     """
-    assertThat(jsonMatchString matchJson array).isSuccess()
+    assertThat((jsonMatchString matchJson array).isSuccess).isTrue()
   }
   ```
 - The entry can be several values delimited by the character "|", 
@@ -281,8 +281,8 @@ they are matched with the corresponding entries in the json array as below:
     val arrayOfJohn = """
     ["John"]
     """
-    assertThat(jsonMatchString matchJson arrayOfSmith).isSuccess()
-    assertThat(jsonMatchString matchJson arrayOfJohn).isSuccess()
+    assertThat((jsonMatchString matchJson arrayOfSmith).isSuccess).isTrue()
+    assertThat((jsonMatchString matchJson arrayOfJohn).isSuccess).isTrue()
   }
   ```
 #### Matching array size
@@ -299,8 +299,8 @@ You can specify the size requirement in the array pattern by appending the size 
         val array = """
             [1, 2]
         """
-        assertThat(jsonMatchString matchJson arrayOfFour).isSuccess()
-        assertThat(jsonMatchString matchJson array).isFailure()
+        assertThat((jsonMatchString matchJson arrayOfFour).isSuccess).isTrue()
+        assertThat((jsonMatchString matchJson array).isSuccess).isFalse()
     }
     ```
   - Size range: appending a pair of integers surrounded by a pair of parentheses, 
@@ -323,10 +323,10 @@ You can specify the size requirement in the array pattern by appending the size 
         val arrayOfFour = """
             [1, 2, 3, 4]
         """
-        assertThat(jsonMatchString matchJson arrayOfOne).isFailure()
-        assertThat(jsonMatchString matchJson arrayOfTwo).isSuccess()
-        assertThat(jsonMatchString matchJson arrayOfThree).isSuccess()
-        assertThat(jsonMatchString matchJson arrayOfFour).isFailure()
+        assertThat((jsonMatchString matchJson arrayOfOne).isSuccess).isFalse()
+        assertThat((jsonMatchString matchJson arrayOfTwo).isSuccess).isTrue()
+        assertThat((jsonMatchString matchJson arrayOfThree).isSuccess).isTrue()
+        assertThat((jsonMatchString matchJson arrayOfFour).isSuccess).isFalse()
     }
     ```
     Both the upper and lower bounds are optional, in which case no restriction on the lower and upper bounds respectively.
@@ -347,10 +347,10 @@ You can specify the size requirement in the array pattern by appending the size 
         val arrayOfFour = """
             [1, 2, 3, 4]
         """
-        assertThat(jsonMatchStringWithNoLowerBound matchJson arrayOfOne).isSuccess()
-        assertThat(jsonMatchStringWithNoLowerBound matchJson arrayOfTwo).isSuccess()
-        assertThat(jsonMatchStringWithNoLowerBound matchJson arrayOfThree).isSuccess()
-        assertThat(jsonMatchStringWithNoLowerBound matchJson arrayOfFour).isFailure()
+        assertThat((jsonMatchStringWithNoLowerBound matchJson arrayOfOne).isSuccess).isTrue()
+        assertThat((jsonMatchStringWithNoLowerBound matchJson arrayOfTwo).isSuccess).isTrue()
+        assertThat((jsonMatchStringWithNoLowerBound matchJson arrayOfThree).isSuccess).isTrue()
+        assertThat((jsonMatchStringWithNoLowerBound matchJson arrayOfFour).isSuccess).isFalse()
     }
     ```
     ```
@@ -370,10 +370,10 @@ You can specify the size requirement in the array pattern by appending the size 
         val arrayOfFour = """
             [1, 2, 3, 4]
         """
-        assertThat(jsonMatchStringWithNoUpperBound matchJson arrayOfOne).isFailure()
-        assertThat(jsonMatchStringWithNoUpperBound matchJson arrayOfTwo).isSuccess()
-        assertThat(jsonMatchStringWithNoUpperBound matchJson arrayOfThree).isSuccess()
-        assertThat(jsonMatchStringWithNoUpperBound matchJson arrayOfFour).isSuccess()
+        assertThat((jsonMatchStringWithNoUpperBound matchJson arrayOfOne).isSuccess).isFalse()
+        assertThat((jsonMatchStringWithNoUpperBound matchJson arrayOfTwo).isSuccess).isTrue()
+        assertThat((jsonMatchStringWithNoUpperBound matchJson arrayOfThree).isSuccess).isTrue()
+        assertThat((jsonMatchStringWithNoUpperBound matchJson arrayOfFour).isSuccess).isTrue()
     }
     ```
 ### Value match
@@ -419,8 +419,8 @@ It can take several formats as below:
     val arrayOfJohn = """
     ["John"]
     """
-    assertThat(jsonMatchString matchJson arrayOfSmith).isSuccess()
-    assertThat(jsonMatchString matchJson arrayOfJohn).isSuccess()
+    assertThat((jsonMatchString matchJson arrayOfSmith).isSuccess).isTrue()
+    assertThat((jsonMatchString matchJson arrayOfJohn).isSuccess).isTrue()
     }
     ```
     and for object field:
@@ -441,8 +441,8 @@ It can take several formats as below:
          "firstName": "John"
        }
     """
-    assertThat(jsonMatchString matchJson jsonOfSmith).isSuccess()
-    assertThat(jsonMatchString matchJson jsonOfJohn).isSuccess()
+    assertThat((jsonMatchString matchJson jsonOfSmith).isSuccess).isTrue()
+    assertThat((jsonMatchString matchJson jsonOfJohn).isSuccess).isTrue()
     }
     ```
 
