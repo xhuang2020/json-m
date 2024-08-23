@@ -1,5 +1,5 @@
 group = "net.json.jsonm"
-version = "1.0-SNAPSHOT"
+version = "0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -14,6 +14,7 @@ dependencies {
 plugins {
     kotlin("jvm") version "1.9.24"
     antlr
+    `maven-publish`
 }
 kotlin {
     jvmToolchain(17)
@@ -26,4 +27,21 @@ tasks.generateGrammarSource {
 }
 tasks.compileKotlin {
     dependsOn(tasks.generateGrammarSource)
+}
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/xhuang2020/json-m")
+            credentials {
+                username = project.findProperty("gpr.github_user") as String
+                password = project.findProperty("gpr.github_token") as String
+            }
+        }
+    }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["kotlin"])
+        }
+    }
 }
