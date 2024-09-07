@@ -11,6 +11,8 @@ internal fun pairMatchCompare(a: JsonmParser.PairMatchContext, b: JsonmParser.Pa
     val otherStr = b.keyMatch().STRING().text
     val rtn: Int = thisStr.compareTo(otherStr)
     if (rtn != 0) return rtn
+    if (a.keyMatch().NEGATION() == null && b.keyMatch().NEGATION() != null) return -1
+    if (a.keyMatch().NEGATION() != null && b.keyMatch().NEGATION() == null) return +1
     if (a.keyMatch().OPTCARD() == null && b.keyMatch().OPTCARD() != null) return -1
     if (a.keyMatch().OPTCARD() != null && b.keyMatch().OPTCARD() == null) return +1
     return 0

@@ -61,11 +61,14 @@ private fun match(
             val pairMatchKeyString = pairMatchKey.STRING().text
             val pairKeyString = pairKey.text
             if (pairMatchKeyString < pairKeyString) {
-                if (pairMatchKey.OPTCARD() == null) {
+                if (pairMatchKey.NEGATION() == null && pairMatchKey.OPTCARD() == null) {
                     return MatchResult(false, "required field ${pairMatchKeyString} missing from ${obj.locateInJson()}")
                 }
                 pairMatchIndex++
             } else if (pairMatchKeyString == pairKeyString) {
+                if (pairMatchKey.NEGATION() != null) {
+                    return MatchResult(false, "The field ${pairKeyString} cannot appear in ${obj.locateInJson()}")
+                }
                 val valueCompare = match(pairM.valueMatch(), pair.value())
                 if (!valueCompare.isSuccess) {
                     return valueCompare
@@ -90,7 +93,7 @@ private fun match(
 
     } else if (pairMatchIndex < pairMatches.size && pairIndex == pairs.size) {
         val missedRequiredKey = pairMatches.subList(pairMatchIndex, pairMatches.size).find {
-            it.keyMatch().WILDCARD() == null && it.keyMatch().OPTCARD() == null
+            it.keyMatch().WILDCARD() == null && it.keyMatch().NEGATION() == null && it.keyMatch().OPTCARD() == null
         }
         if (missedRequiredKey != null) {
             return MatchResult(false, "required field ${missedRequiredKey.keyMatch().STRING().text} missing from ${obj.locateInJson()}")

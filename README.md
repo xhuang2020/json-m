@@ -124,6 +124,26 @@ fun test() {
 }
 ```
 
+- If the key is prefixed with an exclamation mark "!", it means that the key must not appear in the target json object,
+in which case its corresponding value has to be a "*".
+```
+fun test() {
+   val jsonMatchString = """
+        {
+            !"firstName": *
+        }
+        """
+   val json = """
+        {
+            "firstName": "John"
+        }
+   """
+   val jsonWithNoKeys = "{}"
+   assertThat((jsonMatchString matchJson json).isSuccess).isFalse()
+   assertThat((jsonMatchString matchJson jsonWithNoKeys).isSuccess).isTrue()
+}
+```
+
 - If the key is the wildcard character "*", it matches with any key in the target json object, i.e.
 the pattern allows any zero, one or more keys appearing in the target json object. 
 This provides a mechanism to allow unspecified keys in json objects.

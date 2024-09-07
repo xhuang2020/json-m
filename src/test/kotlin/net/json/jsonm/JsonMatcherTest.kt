@@ -94,6 +94,22 @@ class JsonMatcherTest {
         Arguments.of(
             """
                 {
+                    !"firstName": *,
+                    "lastName": "Smith",
+                    *: *
+                }
+            """,
+            """
+                {
+                    "lastName": "Smith",
+                    "sex": "Male"
+                }
+            """,
+            MatchResult(true)
+        ),
+        Arguments.of(
+            """
+                {
                     "firstName"?: "John",
                     "lastName": "Smith"
                 }
@@ -150,6 +166,23 @@ class JsonMatcherTest {
                 }
             """,
             MatchResult(false, "unexpected field \"second_lastName\" in object $")
+        ),
+        Arguments.of(
+            """
+                {
+                    !"firstName": *,
+                    "lastName": "Smith",
+                    *: *
+                }
+            """,
+            """
+                {
+                    "firstName": "John",
+                    "lastName": "Smith",
+                    "sex": "Male"
+                }
+            """,
+            MatchResult(false, "The field \"firstName\" cannot appear in $")
         ),
         Arguments.of(
             """

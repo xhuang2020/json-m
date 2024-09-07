@@ -30,6 +30,8 @@ WILDCARD: '*'
     ;
 OPTCARD: '?'
     ;
+NEGATION: '!'
+    ;
 BOOLEAN: 'false'
     | 'true'
     ;
@@ -89,6 +91,7 @@ objectMatch: '{' pairMatch (',' pairMatch)* '}'
 pairMatch: keyMatch ':' valueMatch
     ;
 keyMatch: WILDCARD
+    | NEGATION STRING
     | STRING OPTCARD
     | STRING
     ;

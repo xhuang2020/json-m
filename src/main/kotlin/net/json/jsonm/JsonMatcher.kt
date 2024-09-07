@@ -13,12 +13,19 @@ class JsonMatcher internal constructor(private val jsonMatch: JsonmParser.JsonMa
         private fun validate(obj: JsonmParser.ObjectMatchContext) {
             val pairs = obj.pairMatch().sortedWith(::pairMatchCompare)
             for (i in pairs.indices) {
+                if (pairs[i].keyMatch().NEGATION() != null) {
+                    if (pairs[i].valueMatch().WILDCARD() == null) {
+                        throw JsonMatchValidationException(
+                            "Negative key '${pairs[i].keyMatch().text}' must have the wild card value in the object ${obj.locateInJson()}"
+                        )
+                    }
+                }
                 if (i > 0) {
                     if (pairMatchCompare(pairs[i-1], pairs[i]) == 0 ||
                         pairs[i-1].keyMatch().STRING() != null && pairs[i].keyMatch().STRING() != null &&
                         pairs[i-1].keyMatch().STRING().text == pairs[i].keyMatch().STRING().text) {
                         throw JsonMatchValidationException(
-                            "Duplicated key '${pairs[i].keyMatch().text}' in the object ${obj.locateInJson()}"
+                            "Duplicated keys '${pairs[i-1].keyMatch().text}', '${pairs[i].keyMatch().text}' in the object ${obj.locateInJson()}"
                         )
                     }
                 }

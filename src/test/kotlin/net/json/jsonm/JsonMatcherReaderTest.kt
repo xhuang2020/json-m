@@ -57,7 +57,8 @@ class JsonMatcherReaderTest {
                 {
                     "name": *,
                     "age": integer[1,100],
-                    "weight": number[0, 210.2)
+                    "weight": number[0, 210.2),
+                    !"sex": *
                 }
             """,
             """
@@ -137,6 +138,24 @@ class JsonMatcherReaderTest {
                {
                  "firstName": "John",
                  "lastName: "Smith"
+               }
+            """,
+            """
+               {
+                 !"firstName"?: *,
+                 "lastName": "Smith"
+               }
+            """,
+            """
+               {
+                 !"firstName": "John",
+                 "lastName": "Smith"
+               }
+            """,
+            """
+               {
+                 !"firstName": *,
+                 "firstName": "Smith"
                }
             """,
             """
